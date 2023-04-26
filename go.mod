@@ -1,4 +1,4 @@
-module go.oneofone.dev/genh
+module github.com/alpineiq/genh
 
 go 1.18
 

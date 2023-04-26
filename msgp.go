@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/vmihailenco/msgpack/v5"
-	"go.oneofone.dev/genh/internal"
+	"github.com/alpineiq/genh/internal"
 )
 
 type (

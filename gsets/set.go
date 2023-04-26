@@ -7,7 +7,7 @@ import (
 	"sort"
 	"unsafe"
 
-	"go.oneofone.dev/genh/internal"
+	"github.com/alpineiq/genh/internal"
 )
 
 func Of[T internal.Ordered](keys ...T) Set[T] {

@@ -5,7 +5,7 @@ import (
 	"sort"
 	"sync"
 
-	"go.oneofone.dev/genh/internal"
+	"github.com/alpineiq/genh/internal"
 )
 
 func SafeOf[T internal.Ordered](keys ...T) *SafeSet[T] {

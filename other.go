@@ -3,7 +3,7 @@ package genh
 import (
 	"reflect"
 
-	"go.oneofone.dev/genh/internal"
+	"github.com/alpineiq/genh/internal"
 )
 
 type (
