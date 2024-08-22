@@ -7,11 +7,11 @@ import (
 )
 
 type tmEle[V any] struct {
-	sync.RWMutex
-	la  atomic.Int64 // last access / read
 	v   V
 	t   *time.Timer
+	la  atomic.Int64
 	ttl time.Duration
+	sync.RWMutex
 }
 
 func (e *tmEle[V]) expired() bool {
@@ -32,6 +32,21 @@ func (tm *TimedMap[K, V]) Set(k K, v V, timeout time.Duration) {
 		ele.t = time.AfterFunc(timeout, func() { tm.deleteEle(k, ele) })
 	}
 	tm.m.Set(k, ele)
+}
+
+func (tm *TimedMap[K, V]) MustGet(k K, vfn func() V, timeout time.Duration) (out V) {
+	var ok bool
+	if out, ok = tm.GetOk(k); ok {
+		return
+	}
+	out = vfn()
+	ele := &tmEle[V]{v: out, ttl: timeout}
+	ele.la.Store(time.Now().UnixNano())
+	if timeout > 0 {
+		ele.t = time.AfterFunc(timeout, func() { tm.deleteEle(k, ele) })
+	}
+	tm.m.Set(k, ele)
+	return
 }
 
 func (tm *TimedMap[K, V]) SetUpdateFn(k K, vfn func() V, updateEvery time.Duration) {
@@ -102,6 +117,17 @@ func (tm *TimedMap[K, V]) Delete(k K) {
 	}
 }
 
+func (tm *TimedMap[K, V]) ForEach(fn func(key K, value V) bool) {
+	keys := tm.m.Keys()
+
+	for _, k := range keys {
+		if v, ok := tm.GetOk(k); ok {
+			if !fn(k, v) {
+				return
+			}
+		}
+	}
+}
 func (tm *TimedMap[K, V]) deleteEle(k K, ele *tmEle[V]) {
 	tm.m.Update(func(m map[K]*tmEle[V]) {
 		if m[k] == ele {

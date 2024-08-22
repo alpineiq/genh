@@ -14,8 +14,8 @@ func LMapOf[K comparable, V any](m map[K]V) *LMap[K, V] {
 }
 
 type LMap[K comparable, V any] struct {
-	mux sync.RWMutex
 	m   map[K]V
+	mux sync.RWMutex
 }
 
 func (lm *LMap[K, V]) Set(k K, v V) {
@@ -144,9 +144,7 @@ func (lm *LMap[K, V]) ForEach(fn func(k K, v V) bool) {
 
 func (lm *LMap[K, V]) Clear() {
 	lm.mux.Lock()
-	for k := range lm.m {
-		delete(lm.m, k)
-	}
+	clear(lm.m)
 	lm.mux.Unlock()
 }
 
